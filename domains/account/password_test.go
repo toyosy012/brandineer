@@ -89,3 +89,40 @@ func (s *PasswordTestSuite) TestMoreUpperLimitLen() {
 
 	s.Nil(password)
 }
+
+func (s *PasswordTestSuite) TestValid() {
+	s.T().Log(
+		fmt.Sprintf("\nテストケース: パスワードバリデーション正常テスト\nテストデータ: %s\n",
+			validLowerLengthPassword,
+		),
+	)
+
+	password, err := NewPassword(s.Validator(), validLowerLengthPassword)
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+
+	if err = password.Valid(); err != nil {
+		s.Fail(err.Error())
+		return
+	}
+
+	s.Equal(validLowerLengthPassword, password.Value())
+}
+
+func (s *PasswordTestSuite) TestPwned() {
+	s.T().Log(
+		fmt.Sprintf("\nテストケース: パスワードバリデーション異常テスト\nテストデータ: %s\n",
+			pwnedPassword,
+		),
+	)
+
+	password, err := NewPassword(s.Validator(), pwnedPassword)
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+
+	s.ErrorIs(errValidation, password.Valid())
+}
