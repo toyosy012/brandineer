@@ -72,7 +72,7 @@ func (s *PasswordTestSuite) TestMoreLowerLimitLen() {
 		),
 	)
 
-	password, err := NewPassword(validLowerLengthPassword)
+	password, err := NewPassword(s.Validator(), validLowerLengthPassword)
 	if err != nil {
 		s.Fail(err.Error())
 		return
@@ -89,7 +89,7 @@ func (s *PasswordTestSuite) TestLessUpperLimitLen() {
 		),
 	)
 
-	password, err := NewPassword(validUpperLengthPassword)
+	password, err := NewPassword(s.Validator(), validUpperLengthPassword)
 	if err != nil {
 		s.Fail(err.Error())
 		return
@@ -106,7 +106,7 @@ func (s *PasswordTestSuite) TestLessLowerLimitLen() {
 		),
 	)
 
-	password, err := NewPassword(invalidLowerLengthPassword)
+	password, err := NewPassword(s.Validator(), invalidLowerLengthPassword)
 	if err != nil {
 		s.ErrorIs(errMinLen, err)
 	}
@@ -122,7 +122,7 @@ func (s *PasswordTestSuite) TestMoreUpperLimitLen() {
 		),
 	)
 
-	password, err := NewPassword(invalidUpperLengthPassword)
+	password, err := NewPassword(s.Validator(), invalidUpperLengthPassword)
 	if err != nil {
 		s.ErrorIs(errMaxLen, err)
 	}

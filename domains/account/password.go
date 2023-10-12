@@ -11,15 +11,17 @@ const (
 )
 
 var (
-	errMinLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
-	errMaxLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
+	errMinLen     = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
+	errMaxLen     = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
+	errValidation = errors.New("不正なパスワードです")
 )
 
 type Password struct {
-	value string
+	validator Validator
+	value     string
 }
 
-func NewPassword(value string) (*Password, error) {
+func NewPassword(validator Validator, value string) (*Password, error) {
 	if lessPasswordLen(value) {
 		return nil, errMinLen
 	}
@@ -28,7 +30,8 @@ func NewPassword(value string) (*Password, error) {
 	}
 
 	return &Password{
-		value: value,
+		validator: validator,
+		value:     value,
 	}, nil
 }
 
@@ -41,4 +44,16 @@ func lessPasswordLen(password string) bool {
 }
 func morePasswordLen(password string) bool {
 	return bcryptMaxLength < len(password)
+}
+
+func (p Password) Valid() error {
+	if err := p.validator.Valid(p); err != nil {
+		return errValidation
+	}
+
+	return nil
+}
+
+type Validator interface {
+	Valid(Password) error
 }
