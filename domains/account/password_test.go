@@ -21,6 +21,7 @@ var (
 	errPwnedHibp              = errors.New("推測されやすいパスワード")
 	errHashedComparedPassword = errors.New("比較対象データの生成に失敗")
 	errHashedTestPassword     = errors.New("テストデータの生成に失敗")
+	errFailHashed             = errors.New("テストデータのハッシュ値計算に失敗")
 )
 
 func TestPassword(t *testing.T) {
@@ -74,8 +75,13 @@ func (s *PasswordTestSuite) TestMoreLowerLimitLen() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), validLowerLengthPassword)
-	if err := password.Valid(); err != nil {
+	password, err := NewPassword(s.Validator(), validLowerLengthPassword)
+	if err != nil {
+		s.Fail(errFailHashed.Error())
+		return
+	}
+
+	if err = password.Valid(); err != nil {
 		s.Fail(err.Error())
 		return
 	}
@@ -91,8 +97,13 @@ func (s *PasswordTestSuite) TestLessUpperLimitLen() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), validUpperLengthPassword)
-	if err := password.Valid(); err != nil {
+	password, err := NewPassword(s.Validator(), validUpperLengthPassword)
+	if err != nil {
+		s.Fail(errFailHashed.Error())
+		return
+	}
+
+	if err = password.Valid(); err != nil {
 		s.Fail(err.Error())
 		return
 	}
@@ -108,7 +119,11 @@ func (s *PasswordTestSuite) TestLessLowerLimitLen() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), invalidLowerLengthPassword)
+	password, err := NewPassword(s.Validator(), invalidLowerLengthPassword)
+	if err != nil {
+		s.Fail(errFailHashed.Error())
+		return
+	}
 	s.ErrorIs(errMinLen, password.Valid())
 }
 
@@ -120,8 +135,8 @@ func (s *PasswordTestSuite) TestMoreUpperLimitLen() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), invalidUpperLengthPassword)
-	s.ErrorIs(errMaxLen, password.Valid())
+	_, err := NewPassword(s.Validator(), invalidUpperLengthPassword)
+	s.ErrorIs(errMaxLen, err)
 }
 
 func (s *PasswordTestSuite) TestValid() {
@@ -131,7 +146,11 @@ func (s *PasswordTestSuite) TestValid() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), validLowerLengthPassword)
+	password, err := NewPassword(s.Validator(), validLowerLengthPassword)
+	if err != nil {
+		s.Fail(errFailHashed.Error())
+		return
+	}
 	s.Equal(validLowerLengthPassword, password.Value())
 }
 
@@ -142,7 +161,11 @@ func (s *PasswordTestSuite) TestErrorImpl() {
 		),
 	)
 
-	password := NewPassword(s.Validator(), pwnedPassword)
+	password, err := NewPassword(s.Validator(), pwnedPassword)
+	if err != nil {
+		s.Fail(errFailHashed.Error())
+		return
+	}
 	s.ErrorIs(errPwnedHibp, password.Valid())
 }
 
