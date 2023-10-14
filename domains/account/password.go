@@ -3,6 +3,7 @@ package account
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -11,20 +12,31 @@ const (
 )
 
 var (
-	errMinLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
-	errMaxLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
+	errMinLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
+	errMaxLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
+	errHashedPassword = errors.New("パスワード生成に失敗")
+	errCompareHash    = errors.New("パスワード検証に失敗")
 )
 
 type Password struct {
 	validator Validator
 	value     string
+	hash      []byte
 }
 
-func NewPassword(validator Validator, value string) Password {
-	return Password{
+func NewPassword(validator Validator, value string) (*Password, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(value), 10)
+	if err != nil {
+		if errors.Is(bcrypt.ErrPasswordTooLong, err) {
+			return nil, errMaxLen
+		}
+		return nil, errHashedPassword
+	}
+	return &Password{
 		validator: validator,
 		value:     value,
-	}
+		hash:      hash,
+	}, nil
 }
 
 func (p Password) Value() string {
@@ -43,6 +55,7 @@ func (p Password) Valid() error {
 		return errMinLen
 	}
 
+	// 初期化時点で検証されるが最大長のバリデーションルールが存在することを明示するために残す
 	if p.morePasswordLen() {
 		return errMaxLen
 	}
@@ -51,6 +64,13 @@ func (p Password) Valid() error {
 		return err
 	}
 
+	return nil
+}
+
+func (p Password) CompareHash(input Password) error {
+	if err := bcrypt.CompareHashAndPassword(p.hash, []byte(input.Value())); err != nil {
+		return errCompareHash
+	}
 	return nil
 }
 
