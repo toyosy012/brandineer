@@ -18,7 +18,9 @@ const (
 )
 
 var (
-	errPwnedHibp = errors.New("推測されやすいパスワード")
+	errPwnedHibp              = errors.New("推測されやすいパスワード")
+	errHashedComparedPassword = errors.New("比較対象データの生成に失敗")
+	errHashedTestPassword     = errors.New("テストデータの生成に失敗")
 )
 
 func TestPassword(t *testing.T) {
@@ -142,4 +144,40 @@ func (s *PasswordTestSuite) TestErrorImpl() {
 
 	password := NewPassword(s.Validator(), pwnedPassword)
 	s.ErrorIs(errPwnedHibp, password.Valid())
+}
+
+func (s *PasswordTestSuite) TestCompareHash() {
+	s.T().Log(
+		fmt.Sprintf("\nテストケース: パスワードハッシュ値の比較正常テスト\nテストデータ: %s\n",
+			validLowerLengthPassword,
+		),
+	)
+
+	password, err := NewPassword(s.validator, validLowerLengthPassword)
+	if err != nil {
+		s.Fail(errHashedComparedPassword.Error())
+	}
+	test, err := NewPassword(s.validator, validLowerLengthPassword)
+	if err != nil {
+		s.Fail(errHashedTestPassword.Error())
+	}
+	s.NoError(password.CompareHash(*test))
+}
+
+func (s *PasswordTestSuite) TestErrCompareHash() {
+	s.T().Log(
+		fmt.Sprintf("\nテストケース: パスワードハッシュ値の比較異常テスト\nテストデータ: %s\n",
+			validLowerLengthPassword,
+		),
+	)
+
+	password, err := NewPassword(s.validator, validLowerLengthPassword)
+	if err != nil {
+		s.Fail(errHashedComparedPassword.Error())
+	}
+	test, err := NewPassword(s.validator, validUpperLengthPassword)
+	if err != nil {
+		s.Fail(errHashedTestPassword.Error())
+	}
+	s.ErrorIs(errCompareHash, password.CompareHash(*test))
 }
