@@ -133,18 +133,13 @@ func (s *PasswordTestSuite) TestValid() {
 	s.Equal(validLowerLengthPassword, password.Value())
 }
 
-func (s *PasswordTestSuite) TestPwned() {
+func (s *PasswordTestSuite) TestErrorImpl() {
 	s.T().Log(
-		fmt.Sprintf("\nテストケース: パスワードバリデーション異常テスト\nテストデータ: %s\n",
+		fmt.Sprintf("\nテストケース: 注入された実装から返されるエラーを返すかをテスト\nテストデータ: %s\n",
 			pwnedPassword,
 		),
 	)
 
-	password, err := NewPassword(s.Validator(), pwnedPassword)
-	if err != nil {
-		s.Fail(err.Error())
-		return
-	}
-
-	s.ErrorIs(errValidation, password.Valid())
+	password := NewPassword(s.Validator(), pwnedPassword)
+	s.ErrorIs(errPwnedHibp, password.Valid())
 }

@@ -11,9 +11,8 @@ const (
 )
 
 var (
-	errMinLen     = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
-	errMaxLen     = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
-	errValidation = errors.New("不正なパスワードです")
+	errMinLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
+	errMaxLen = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
 )
 
 type Password struct {
@@ -49,7 +48,7 @@ func (p Password) Valid() error {
 	}
 
 	if err := p.validator.Valid(p); err != nil {
-		return errValidation
+		return err
 	}
 
 	return nil
