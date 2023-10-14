@@ -95,7 +95,7 @@ func (s *PasswordTestSuite) TestLessUpperLimitLen() {
 		return
 	}
 
-	s.Equal(validUpperLengthPassword, password.value)
+	s.Equal(validUpperLengthPassword, password.Value())
 }
 
 func (s *PasswordTestSuite) TestLessLowerLimitLen() {
