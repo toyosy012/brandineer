@@ -48,8 +48,8 @@ func (v NSPVValidator) Valid(value Password) error {
 		return err
 	}
 
-	if r != nspv.ViolateHibpCheck {
-		return errPwned
+	if r == nspv.ViolateHibpCheck {
+		return errPwnedHibp
 	}
 	return nil
 }
