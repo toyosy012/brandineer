@@ -21,32 +21,33 @@ type Password struct {
 	value     string
 }
 
-func NewPassword(validator Validator, value string) (*Password, error) {
-	if lessPasswordLen(value) {
-		return nil, errMinLen
-	}
-	if morePasswordLen(value) {
-		return nil, errMaxLen
-	}
-
-	return &Password{
+func NewPassword(validator Validator, value string) Password {
+	return Password{
 		validator: validator,
 		value:     value,
-	}, nil
+	}
 }
 
 func (p Password) Value() string {
 	return p.value
 }
 
-func lessPasswordLen(password string) bool {
-	return len(password) < bcryptMinLength
+func (p Password) lessPasswordLen() bool {
+	return len(p.Value()) < bcryptMinLength
 }
-func morePasswordLen(password string) bool {
-	return bcryptMaxLength < len(password)
+func (p Password) morePasswordLen() bool {
+	return bcryptMaxLength < len(p.Value())
 }
 
 func (p Password) Valid() error {
+	if p.lessPasswordLen() {
+		return errMinLen
+	}
+
+	if p.morePasswordLen() {
+		return errMaxLen
+	}
+
 	if err := p.validator.Valid(p); err != nil {
 		return errValidation
 	}
