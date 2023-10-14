@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	errPwned = errors.New("漏洩しやすいパスワード")
+	errPwnedHibp = errors.New("推測されやすいパスワード")
 )
 
 func TestPassword(t *testing.T) {
