@@ -67,3 +67,35 @@ func (s *UsernameTestSuite) TestFirstBlank() {
 	s.T().Log(fmt.Sprintf("\nテストケース: ユーザー名空文字使用テスト\nテストデータ: %s", username))
 	s.ErrorIs(errUsernameFormat, username.Valid())
 }
+
+func TestUserAccount(t *testing.T) {
+	suite.Run(t, NewUserAccountTestSuite())
+}
+
+type TestUserAccountSuite struct {
+	suite.Suite
+}
+
+func NewUserAccountTestSuite() *TestUserAccountSuite { return &TestUserAccountSuite{} }
+
+func (s *TestUserAccountSuite) TestValidCreateUserAccount() {
+	s.T().Log(
+		fmt.Sprintf(
+			"\nテストケース: ユーザーアカウント作成処理正常系テスト\nテストデータ: \nユーザー名:%s",
+			moreLowerLimitLenUsername,
+		),
+	)
+	name := NewUsername(moreLowerLimitLenUsername)
+	if err := name.Valid(); err != nil {
+		s.Fail(err.Error())
+		return
+	}
+	account := NewUserAccount(name)
+
+	s.Equal(
+		UserAccount{
+			username: moreLowerLimitLenUsername,
+		},
+		account,
+	)
+}
