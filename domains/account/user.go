@@ -44,4 +44,10 @@ type UserAccount struct {
 	username Username
 }
 
+func NewUserAccount(name Username) UserAccount {
+	return UserAccount{
+		username: name,
+	}
+}
+
 func (u UserAccount) Username() Username { return u.username }
