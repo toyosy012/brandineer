@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	bcryptMaxLength = 72
-	bcryptMinLength = 8
+	passwordMaxLength = 72
+	passwordMinLength = 8
 )
 
 var (
-	errMinLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMinLength))
-	errMaxLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", bcryptMaxLength))
+	errMinLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", passwordMinLength))
+	errMaxLen         = errors.New(fmt.Sprintf("パスワードの文字数は%d文字上にしてください", passwordMaxLength))
 	errHashedPassword = errors.New("パスワード生成に失敗")
 	errCompareHash    = errors.New("パスワード検証に失敗")
 )
@@ -44,10 +44,10 @@ func (p Password) Value() string {
 }
 
 func (p Password) lessPasswordLen() bool {
-	return len(p.Value()) < bcryptMinLength
+	return len(p.Value()) < passwordMinLength
 }
 func (p Password) morePasswordLen() bool {
-	return bcryptMaxLength < len(p.Value())
+	return passwordMaxLength < len(p.Value())
 }
 
 func (p Password) Valid() error {
