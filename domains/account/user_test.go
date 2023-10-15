@@ -20,7 +20,7 @@ var (
 	moreUpperLimitLenUsername = strings.Repeat("a", 101)
 )
 
-func TestUser(t *testing.T) {
+func TestUsername(t *testing.T) {
 	suite.Run(t, NewUsernameTestSuite())
 }
 
