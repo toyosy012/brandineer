@@ -3,6 +3,7 @@ package account
 import (
 	"errors"
 	"fmt"
+	"net/mail"
 	"regexp"
 )
 
@@ -42,12 +43,18 @@ func (u Username) Valid() error {
 
 type UserAccount struct {
 	username Username
+	email    mail.Address
+	password Password
 }
 
-func NewUserAccount(name Username) UserAccount {
+func NewUserAccount(name Username, email mail.Address, password Password) UserAccount {
 	return UserAccount{
 		username: name,
+		email:    email,
+		password: password,
 	}
 }
 
-func (u UserAccount) Username() Username { return u.username }
+func (u UserAccount) Username() Username  { return u.username }
+func (u UserAccount) Email() mail.Address { return u.email }
+func (u UserAccount) Password() Password  { return u.password }
