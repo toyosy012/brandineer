@@ -17,8 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: View Dierctory
-        run: ls
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v4
         with:
