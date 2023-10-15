@@ -23,11 +23,11 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: go.sum
       - name: View Go Version
         run: go version
       - name: Install dependencies
-        run: go install
+        run: |
+          go get .
       - name: Vet
         run: go vet ./...
       - name: Test with the Go CLI
