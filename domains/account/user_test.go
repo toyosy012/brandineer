@@ -2,6 +2,7 @@ package account
 
 import (
 	"fmt"
+	"net/mail"
 	"strings"
 	"testing"
 
@@ -68,12 +69,37 @@ func (s *UsernameTestSuite) TestFirstBlank() {
 	s.ErrorIs(errUsernameFormat, username.Valid())
 }
 
+const (
+	validEmail = "user1@example.com"
+)
+
 func TestUserAccount(t *testing.T) {
 	suite.Run(t, NewUserAccountTestSuite())
 }
 
 type TestUserAccountSuite struct {
 	suite.Suite
+
+	validEmailAddress mail.Address
+	passwordValidator Validator
+	validPassword     Password
+}
+
+func (s *TestUserAccountSuite) SetupSuite() {
+	validEmailAddress, err := mail.ParseAddress(validEmail)
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+	s.validEmailAddress = *validEmailAddress
+
+	s.passwordValidator = NewNSPVValidator()
+	validPassword, err := NewPassword(s.passwordValidator, validLowerLengthPassword)
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+	s.validPassword = *validPassword
 }
 
 func NewUserAccountTestSuite() *TestUserAccountSuite { return &TestUserAccountSuite{} }
@@ -81,20 +107,25 @@ func NewUserAccountTestSuite() *TestUserAccountSuite { return &TestUserAccountSu
 func (s *TestUserAccountSuite) TestValidCreateUserAccount() {
 	s.T().Log(
 		fmt.Sprintf(
-			"\nテストケース: ユーザーアカウント作成処理正常系テスト\nテストデータ: \nユーザー名:%s",
+			"\nテストケース: ユーザーアカウント作成処理正常系テスト\nテストデータ: \nユーザー名:%s\nメールアドレス:%s\nパスワード:%s",
 			moreLowerLimitLenUsername,
+			validEmail,
+			validLowerLengthPassword,
 		),
 	)
+
 	name := NewUsername(moreLowerLimitLenUsername)
 	if err := name.Valid(); err != nil {
 		s.Fail(err.Error())
 		return
 	}
-	account := NewUserAccount(name)
 
+	account := NewUserAccount(name, s.validEmailAddress, s.validPassword)
 	s.Equal(
 		UserAccount{
 			username: moreLowerLimitLenUsername,
+			email:    s.validEmailAddress,
+			password: s.validPassword,
 		},
 		account,
 	)
