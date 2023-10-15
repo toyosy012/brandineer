@@ -1,11 +1,11 @@
-name: Go
+name: Go Test
 
 on:
   push:
     branches:
       - "**-#**"
     paths:
-      - ".go"
+      - "**.go"
   workflow_dispatch:
 
 jobs:
