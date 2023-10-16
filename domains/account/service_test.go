@@ -27,10 +27,8 @@ func TestUserAccountService(t *testing.T) {
 type UserAccountServiceTest struct {
 	suite.Suite
 
-	id                        uuid.UUID
-	userAccountService        UserAccountService
-	validFindUserAccountInput FindUserAccountInput
-	validUserAccountOutput    UserAccountOutput
+	validationID       uuid.UUID
+	userAccountService UserAccountService
 }
 
 func NewUserAccountServiceTestSuite() UserAccountServiceTest { return UserAccountServiceTest{} }
@@ -46,17 +44,15 @@ func (s *UserAccountServiceTest) SetupSuite() {
 	s.userAccountService = NewUserAccountService(dbStub)
 }
 
-func (s *UserAccountServiceTest) TestFindUserAccount() {
-	input := NewFindUserAccountInput(s.id)
-	output, err := s.userAccountService.Find(input)
+func (s *UserAccountServiceTest) TestFindUserAccountOutput() {
+	account, err := s.userAccountService.Find(s.validationID)
 	if err != nil {
 		s.Fail(err.Error())
 		return
 	}
 
-	account := output.UserAccount()
 	s.Equal(
-		NewUserAccount(),
-		account,
+		NewUserAccountOutput(s.validUserAccount),
+		*account,
 	)
 }
