@@ -8,6 +8,7 @@ import (
 
 type UserAccountRepository interface {
 	Find(uuid.UUID) (*UserAccount, error)
+	List() ([]UserAccount, error)
 }
 
 type UserAccountOutput struct {
@@ -38,6 +39,20 @@ func (s UserAccountService) Find(id uuid.UUID) (*UserAccountOutput, error) {
 
 	output := NewUserAccountOutput(*account)
 	return &output, nil
+}
+
+func (s UserAccountService) List() ([]UserAccountOutput, error) {
+	accounts, err := s.userAccountRepository.List()
+	if err != nil {
+		return nil, err
+	}
+
+	var outputs []UserAccountOutput
+	for _, a := range accounts {
+		outputs = append(outputs, NewUserAccountOutput(a))
+	}
+
+	return outputs, nil
 }
 
 func NewUserAccountService(repository UserAccountRepository) UserAccountService {
