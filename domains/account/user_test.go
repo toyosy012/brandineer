@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -71,6 +72,7 @@ func (s *UsernameTestSuite) TestFirstBlank() {
 
 const (
 	validEmail = "user1@example.com"
+	validUUID  = "f311a818-5d48-4603-8543-368976dcca6b"
 )
 
 func TestUserAccount(t *testing.T) {
@@ -83,6 +85,7 @@ type TestUserAccountSuite struct {
 	validEmailAddress mail.Address
 	passwordValidator Validator
 	validPassword     Password
+	validUUID         uuid.UUID
 }
 
 func (s *TestUserAccountSuite) SetupSuite() {
@@ -100,6 +103,13 @@ func (s *TestUserAccountSuite) SetupSuite() {
 		return
 	}
 	s.validPassword = *validPassword
+
+	id, err := uuid.Parse(validUUID)
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+	s.validUUID = id
 }
 
 func NewUserAccountTestSuite() *TestUserAccountSuite { return &TestUserAccountSuite{} }
@@ -107,7 +117,8 @@ func NewUserAccountTestSuite() *TestUserAccountSuite { return &TestUserAccountSu
 func (s *TestUserAccountSuite) TestValidCreateUserAccount() {
 	s.T().Log(
 		fmt.Sprintf(
-			"\nテストケース: ユーザーアカウント作成処理正常系テスト\nテストデータ: \nユーザー名:%s\nメールアドレス:%s\nパスワード:%s",
+			"\nテストケース: ユーザーアカウント作成処理正常系テスト\nテストデータ: \nID:%s\nユーザー名:%s\nメールアドレス:%s\nパスワード:%s",
+			validUUID,
 			moreLowerLimitLenUsername,
 			validEmail,
 			validLowerLengthPassword,
@@ -120,9 +131,10 @@ func (s *TestUserAccountSuite) TestValidCreateUserAccount() {
 		return
 	}
 
-	account := NewUserAccount(name, s.validEmailAddress, s.validPassword)
+	account := NewUserAccount(s.validUUID, name, s.validEmailAddress, s.validPassword)
 	s.Equal(
 		UserAccount{
+			id:       s.validUUID,
 			username: moreLowerLimitLenUsername,
 			email:    s.validEmailAddress,
 			password: s.validPassword,
