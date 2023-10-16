@@ -15,8 +15,8 @@ type UserAccountRepositoryStub struct{}
 func NewUserAccountRepositoryStub() UserAccountRepositoryStub {
 	return UserAccountRepositoryStub{}
 }
-func (s UserAccountRepositoryStub) Find(input UserAccountInput) (*UserAccountOutput, error) {
-	return s.validUserAccountOutput, nil
+func (s UserAccountRepositoryStub) Find(_ uuid.UUID) (*UserAccount, error) {
+	return &s.validUserAccount, nil
 }
 
 func TestUserAccountService(t *testing.T) {
