@@ -15,16 +15,22 @@ const (
 )
 
 type UserAccountRepositoryStub struct {
-	validUserAccount UserAccount
+	validUserAccount  UserAccount
+	validUserAccounts []UserAccount
 }
 
 func NewUserAccountRepositoryStub(account UserAccount) UserAccountRepositoryStub {
 	return UserAccountRepositoryStub{
-		validUserAccount: account,
+		validUserAccount:  account,
+		validUserAccounts: []UserAccount{account},
 	}
 }
 func (s UserAccountRepositoryStub) Find(_ uuid.UUID) (*UserAccount, error) {
 	return &s.validUserAccount, nil
+}
+
+func (s UserAccountRepositoryStub) List() ([]UserAccount, error) {
+	return s.validUserAccounts, nil
 }
 
 func TestUserAccountService(t *testing.T) {
@@ -38,6 +44,7 @@ type UserAccountServiceTest struct {
 	validationID       uuid.UUID
 	userAccountService UserAccountService
 	validUserAccount   UserAccount
+	validUserAccounts  []UserAccount
 }
 
 func NewUserAccountServiceTestSuite() UserAccountServiceTest { return UserAccountServiceTest{} }
@@ -61,6 +68,7 @@ func (s *UserAccountServiceTest) SetupSuite() {
 
 	account := NewUserAccount(id, NewUsername(validServiceUsername), *address, *password)
 	s.validUserAccount = account
+	s.validUserAccounts = []UserAccount{account}
 	dbStub := NewUserAccountRepositoryStub(account)
 	s.userAccountService = NewUserAccountService(dbStub)
 }
@@ -75,5 +83,23 @@ func (s *UserAccountServiceTest) TestFindUserAccountOutput() {
 	s.Equal(
 		NewUserAccountOutput(s.validUserAccount),
 		*account,
+	)
+}
+
+func (s *UserAccountServiceTest) TestFindUserAccountsOutput() {
+	accounts, err := s.userAccountService.List()
+	if err != nil {
+		s.Fail(err.Error())
+		return
+	}
+
+	var outputs []UserAccountOutput
+	for _, a := range s.validUserAccounts {
+		outputs = append(outputs, NewUserAccountOutput(a))
+	}
+
+	s.Equal(
+		outputs,
+		accounts,
 	)
 }
