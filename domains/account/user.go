@@ -3,6 +3,7 @@ package account
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"net/mail"
 	"regexp"
 )
@@ -42,13 +43,15 @@ func (u Username) Valid() error {
 }
 
 type UserAccount struct {
+	id       uuid.UUID
 	username Username
 	email    mail.Address
 	password Password
 }
 
-func NewUserAccount(name Username, email mail.Address, password Password) UserAccount {
+func NewUserAccount(id uuid.UUID, name Username, email mail.Address, password Password) UserAccount {
 	return UserAccount{
+		id:       id,
 		username: name,
 		email:    email,
 		password: password,
